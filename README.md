@@ -1,16 +1,37 @@
-# React + Vite
+# 🍸 CHEFEDEBAR
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicativo web para bartenders e entusiastas de coquetelaria — receitas clássicas, calculadora de sucos e uma base de conhecimento sobre destilados, licores e bitters.
 
-Currently, two official plugins are available:
+## 🎯 Sobre o projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Projeto pessoal desenvolvido para colocar em prática modelagem de banco de dados, integração frontend-backend e boas práticas de desenvolvimento web, unindo minha experiência anterior em coquetelaria/gastronomia com minha formação em tecnologia.
 
-## React Compiler
+Desenvolvido com apoio de ferramentas de IA para acelerar a escrita de código, com modelagem de dados, decisões de arquitetura e debugging conduzidos por mim.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tecnologias
 
-## Expanding the ESLint configuration
+- **Frontend:** React + Tailwind CSS
+- **Backend / Banco de dados:** Xano
+- **Design:** Figma
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Funcionalidades
+
+- 🏠 **Home** com sugestões aleatórias de cocktails e acesso rápido à calculadora
+- 🍹 **Catálogo de Cocktails** filtrado por categoria (Unforgettables / Contemporary Classics), com busca por nome
+- 📖 **Página de receita** com ingredientes, modo de preparo, garnish e notas
+- 🧮 **Super Juice Calculator**: calcula ácido cítrico, málico e água a partir do peso das cascas de cítricos (conceito baseado na calculadora criada por Kevin Kos)
+- 📚 Base de dados própria com destilados, licores, bitters e xaropes/infusões
+
+## 🗄️ Modelagem de dados
+
+O banco foi estruturado no Xano com tabelas normalizadas para bebidas, xaropes e cocktails, priorizando reuso e consistência (por exemplo, cada variação de xarope é um registro independente e buscável, em vez de ficar "escondida" dentro das notas de uma receita base).
+
+## 🎨 Design (Figma)
+
+![Visão geral do protótipo](./assets/figma-overview.png)
+
+🔗 [Ver protótipo no Figma](https://www.figma.com/proto/sRwegUgmyFrj97rBEhXkbX/Sem-título?node-id=12-49&t=pItZ9mqxSE8sKaMI-1)
+
+## 📌 Status
+
+Em desenvolvimento — próximas etapas incluem as telas de Bases & Xaropes, História & Contexto e Favoritos.
