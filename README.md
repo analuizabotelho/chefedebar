@@ -28,7 +28,9 @@ O banco foi estruturado no Xano com tabelas normalizadas para bebidas, xaropes e
 
 ## 🎨 Design (Figma)
 
-![Visão geral do protótipo](./assets/figma-overview.png)
+![Visão geral do protótipo](./assets/figma-overview1.png)
+
+![Fluxo de telas](./assets/figma-overview2.png)
 
 🔗 [Ver protótipo no Figma](https://www.figma.com/proto/sRwegUgmyFrj97rBEhXkbX/Sem-título?node-id=12-49&t=pItZ9mqxSE8sKaMI-1)
 
