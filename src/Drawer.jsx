@@ -6,7 +6,7 @@ const MENU_ITEMS = [
   { label: "História & Contexto", icon: ScrollText },
   { label: "Super Juice Calculator", icon: Calculator },
   { label: "Favoritos", icon: Heart },
-  { label: "Sobre nós", icon: Info },
+  { label: "Sobre o app", icon: Info },
 ];
 
 export default function Drawer({ open, onClose, onNavigate }) {

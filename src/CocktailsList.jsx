@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Menu, Search, ArrowLeft } from "lucide-react";
+import BottomNav from "./BottomNav";
 
 const COCKTAILS_API_URL = "https://x8ki-letl-twmt.n7.xano.io/api:ePYR7DTm/cocktails";
 
 const CATEGORIES = ["Unforgettables", "Contemporary Classics"];
 
-export default function CocktailsList({ onBack, onOpenCocktail, onOpenMenu }) {
+export default function CocktailsList({ onBack, onOpenCocktail, onNavigate }) {
   const [cocktails, setCocktails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -114,6 +115,8 @@ export default function CocktailsList({ onBack, onOpenCocktail, onOpenMenu }) {
             </div>
           )}
         </main>
+
+        <BottomNav active="cocktailsList" onNavigate={onNavigate} />
       </div>
     </div>
   );

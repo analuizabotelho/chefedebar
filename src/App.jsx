@@ -3,13 +3,20 @@ import { Menu, Search, Calculator, Home, BookOpen, Heart, User } from "lucide-re
 import Drawer from "./Drawer";
 import CocktailsList from "./CocktailsList";
 import CocktailDetail from "./CocktailDetail";
+import HistoriaContexto from "./HistoriaContexto";
+import BasesXaropes from "./BasesXaropes";
+import GlobalSearch from "./GlobalSearch";
+import SuperJuiceCalculator from "./SuperJuiceCalculator";
+import BottomNav from "./BottomNav";
+import SobreApp from "./SobreApp";
+import Perfil from "./Perfil";
 
 const COCKTAILS_API_URL = "https://x8ki-letl-twmt.n7.xano.io/api:ePYR7DTm/cocktails";
 
 const CITRICOS = [
-  { nome: "Limão Siciliano", acidoCitrico: "6.4%", acidoMalico: "0.1%", agua: "88%" },
-  { nome: "Limão Taiti", acidoCitrico: "5.0%", acidoMalico: "0.1%", agua: "90%" },
-  { nome: "Laranja", acidoCitrico: "1.0%", acidoMalico: "0.2%", agua: "86%" },
+  { nome: "Limão Siciliano", emoji: "🍋", acidoCitrico: "6.4%", acidoMalico: "0.1%", agua: "88%" },
+  { nome: "Limão Taiti", emoji: "🍋‍🟩", acidoCitrico: "5.0%", acidoMalico: "0.1%", agua: "90%" },
+  { nome: "Laranja", emoji: "🍊", acidoCitrico: "1.0%", acidoMalico: "0.2%", agua: "86%" },
 ];
 
 function pickRandom(list, count) {
@@ -37,6 +44,7 @@ function useRandomCocktailsFromApi(count = 10) {
       })
       .then((data) => {
         if (cancelled) return;
+        // Só usa cocktails que já têm foto cadastrada pro carrossel
         const comFoto = data.filter((c) => c.image_url && c.image_url.trim() !== "");
         const fonte = comFoto.length > 0 ? comFoto : data;
         setCocktails(pickRandom(fonte, count));
@@ -62,8 +70,16 @@ export default function App() {
   const [citrico, setCitrico] = useState(CITRICOS[0]);
   const [resultado, setResultado] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [view, setView] = useState("home");
+  const [view, setView] = useState("home"); // "home" | "cocktailsList" | "cocktailDetail"
   const [selectedCocktailId, setSelectedCocktailId] = useState(null);
+  const [pendingSearch, setPendingSearch] = useState("");
+
+  // Favoritos ainda não tem tela própria — por enquanto,
+  // tocar nele não faz nada (fica só o ícone "aceso" pra indicar onde estamos)
+  const IMPLEMENTED_VIEWS = ["home", "cocktailsList", "calculator", "perfil"];
+  function handleNavigate(key) {
+    if (IMPLEMENTED_VIEWS.includes(key)) setView(key);
+  }
 
   if (view === "cocktailsList") {
     return (
@@ -73,6 +89,7 @@ export default function App() {
           setSelectedCocktailId(id);
           setView("cocktailDetail");
         }}
+        onNavigate={handleNavigate}
       />
     );
   }
@@ -84,6 +101,38 @@ export default function App() {
         onBack={() => setView("cocktailsList")}
       />
     );
+  }
+
+  if (view === "historia") {
+    return (
+      <HistoriaContexto
+        onBack={() => setView("home")}
+        initialSearch={pendingSearch}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  if (view === "bases") {
+    return (
+      <BasesXaropes
+        onBack={() => setView("home")}
+        initialSearch={pendingSearch}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  if (view === "calculator") {
+    return <SuperJuiceCalculator onBack={() => setView("home")} onNavigate={handleNavigate} />;
+  }
+
+  if (view === "sobre") {
+    return <SobreApp onBack={() => setView("home")} onNavigate={handleNavigate} />;
+  }
+
+  if (view === "perfil") {
+    return <Perfil onBack={() => setView("home")} onNavigate={handleNavigate} />;
   }
 
   function calcular() {
@@ -114,7 +163,11 @@ export default function App() {
       <div className="w-full max-w-sm flex flex-col min-h-screen">
 
         <div className="px-5 pt-6 pb-4">
-          <img src="/assets/chefedebar-logo.png" alt="chefedebar" className="h-8" />
+          <img
+            src="/assets/chefedebar-logo.png"
+            alt="chefedebar"
+            className="h-8"
+          />
         </div>
 
         <header className="flex items-center gap-3 px-5 pb-4">
@@ -125,14 +178,21 @@ export default function App() {
           >
             <Menu size={24} strokeWidth={1.5} />
           </button>
-          <div className="flex-1 flex items-center bg-transparent border border-white/40 rounded-full px-4 py-2">
-            <input
-              type="text"
-              placeholder="Buscar receita"
-              className="bg-transparent flex-1 text-sm text-white placeholder-white/50 outline-none"
-              style={{ fontFamily: "'Quicksand', sans-serif" }}
+          <div className="flex-1">
+            <GlobalSearch
+              onOpenCocktail={(id) => {
+                setSelectedCocktailId(id);
+                setView("cocktailDetail");
+              }}
+              onOpenHistoria={(name) => {
+                setPendingSearch(name);
+                setView("historia");
+              }}
+              onOpenBases={(name) => {
+                setPendingSearch(name);
+                setView("bases");
+              }}
             />
-            <Search size={18} strokeWidth={1.5} className="text-white/70" />
           </div>
         </header>
 
@@ -175,14 +235,17 @@ export default function App() {
             )}
           </div>
 
-          <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={() => setView("calculator")}
+            className="flex items-center gap-2 mb-3"
+          >
             <Calculator size={18} strokeWidth={1.5} />
             <span className="text-sm">Super Juice Calculator</span>
-          </div>
+          </button>
 
           <div className="bg-white text-black rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-base">🍋</span>
+              <span className="text-base">{citrico.emoji}</span>
               <select
                 value={citrico.nome}
                 onChange={(e) =>
@@ -235,15 +298,7 @@ export default function App() {
           </div>
         </main>
 
-        <nav className="fixed bottom-0 w-full max-w-sm bg-black border-t border-white/10 flex justify-around items-center py-3">
-          <Home size={22} strokeWidth={1.5} />
-          <button onClick={() => setView("cocktailsList")} aria-label="Ver cocktails">
-            <BookOpen size={22} strokeWidth={1.5} />
-          </button>
-          <Heart size={22} strokeWidth={1.5} />
-          <Calculator size={22} strokeWidth={1.5} />
-          <User size={22} strokeWidth={1.5} />
-        </nav>
+        <BottomNav active="home" onNavigate={handleNavigate} />
       </div>
 
       <Drawer
@@ -252,6 +307,10 @@ export default function App() {
         onNavigate={(label) => {
           setDrawerOpen(false);
           if (label === "Cocktails") setView("cocktailsList");
+          if (label === "História & Contexto") setView("historia");
+          if (label === "Bases & Xaropes") setView("bases");
+          if (label === "Super Juice Calculator") setView("calculator");
+          if (label === "Sobre o app") setView("sobre");
         }}
       />
     </div>
