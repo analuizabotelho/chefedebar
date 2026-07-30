@@ -10,13 +10,17 @@ import SuperJuiceCalculator from "./SuperJuiceCalculator";
 import BottomNav from "./BottomNav";
 import SobreApp from "./SobreApp";
 import Perfil from "./Perfil";
+import Favoritos from "./Favoritos";
 
 const COCKTAILS_API_URL = "https://x8ki-letl-twmt.n7.xano.io/api:ePYR7DTm/cocktails";
 
+const AGUA_MULTIPLICADOR = 16.66; // água = peso das cascas × 16.66, igual em todos os cítricos
+
 const CITRICOS = [
-  { nome: "Limão Siciliano", emoji: "🍋", acidoCitrico: "6.4%", acidoMalico: "0.1%", agua: "88%" },
-  { nome: "Limão Taiti", emoji: "🍋‍🟩", acidoCitrico: "5.0%", acidoMalico: "0.1%", agua: "90%" },
-  { nome: "Laranja", emoji: "🍊", acidoCitrico: "1.0%", acidoMalico: "0.2%", agua: "86%" },
+  { nome: "Limão Siciliano", emoji: "🍋", acidoCitrico: 1.0, acidoMalico: 0 },
+  { nome: "Limão Taiti", emoji: "🍋‍🟩", acidoCitrico: 0.6667, acidoMalico: 0.333 },
+  { nome: "Laranja", emoji: "🍊", acidoCitrico: 0.90, acidoMalico: 0.11 },
+  { nome: "Toranja", emoji: "🍈", acidoCitrico: 0.80, acidoMalico: 0.20, msg: 0.0333 },
 ];
 
 function pickRandom(list, count) {
@@ -73,22 +77,24 @@ export default function App() {
   const [view, setView] = useState("home"); // "home" | "cocktailsList" | "cocktailDetail"
   const [selectedCocktailId, setSelectedCocktailId] = useState(null);
   const [pendingSearch, setPendingSearch] = useState("");
+  const [previousView, setPreviousView] = useState("home");
 
-  // Favoritos ainda não tem tela própria — por enquanto,
-  // tocar nele não faz nada (fica só o ícone "aceso" pra indicar onde estamos)
-  const IMPLEMENTED_VIEWS = ["home", "cocktailsList", "calculator", "perfil"];
+  const IMPLEMENTED_VIEWS = ["home", "cocktailsList", "calculator", "perfil", "favoritos"];
   function handleNavigate(key) {
     if (IMPLEMENTED_VIEWS.includes(key)) setView(key);
+  }
+
+  function openCocktail(id, fromView) {
+    setSelectedCocktailId(id);
+    setPreviousView(fromView);
+    setView("cocktailDetail");
   }
 
   if (view === "cocktailsList") {
     return (
       <CocktailsList
         onBack={() => setView("home")}
-        onOpenCocktail={(id) => {
-          setSelectedCocktailId(id);
-          setView("cocktailDetail");
-        }}
+        onOpenCocktail={(id) => openCocktail(id, "cocktailsList")}
         onNavigate={handleNavigate}
       />
     );
@@ -98,7 +104,7 @@ export default function App() {
     return (
       <CocktailDetail
         cocktailId={selectedCocktailId}
-        onBack={() => setView("cocktailsList")}
+        onBack={() => setView(previousView)}
       />
     );
   }
@@ -135,19 +141,27 @@ export default function App() {
     return <Perfil onBack={() => setView("home")} onNavigate={handleNavigate} />;
   }
 
+  if (view === "favoritos") {
+    return (
+      <Favoritos
+        onBack={() => setView("home")}
+        onOpenCocktail={(id) => openCocktail(id, "favoritos")}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
   function calcular() {
     const peso = parseFloat(pesoCascas);
     if (!peso || peso <= 0) {
       setResultado(null);
       return;
     }
-    const ac = parseFloat(citrico.acidoCitrico) / 100;
-    const am = parseFloat(citrico.acidoMalico) / 100;
-    const ag = parseFloat(citrico.agua) / 100;
     setResultado({
-      acidoCitrico: (peso * ac).toFixed(1),
-      acidoMalico: (peso * am).toFixed(1),
-      agua: (peso * ag).toFixed(1),
+      acidoCitrico: (peso * citrico.acidoCitrico).toFixed(1),
+      acidoMalico: (peso * citrico.acidoMalico).toFixed(1),
+      msg: citrico.msg ? (peso * citrico.msg).toFixed(1) : null,
+      agua: (peso * AGUA_MULTIPLICADOR).toFixed(0),
     });
   }
 
@@ -180,10 +194,7 @@ export default function App() {
           </button>
           <div className="flex-1">
             <GlobalSearch
-              onOpenCocktail={(id) => {
-                setSelectedCocktailId(id);
-                setView("cocktailDetail");
-              }}
+              onOpenCocktail={(id) => openCocktail(id, "home")}
               onOpenHistoria={(name) => {
                 setPendingSearch(name);
                 setView("historia");
@@ -216,10 +227,7 @@ export default function App() {
                   <button
                     key={c.id}
                     className="shrink-0 w-24 h-24 rounded-xl overflow-hidden bg-black/5"
-                    onClick={() => {
-                      setSelectedCocktailId(c.id);
-                      setView("cocktailDetail");
-                    }}
+                    onClick={() => openCocktail(c.id, "home")}
                     aria-label={`Ver receita ${c.name}`}
                   >
                     {c.image_url ? (
@@ -286,15 +294,18 @@ export default function App() {
                 <span>Ácido Málico</span>
                 <span>{resultado ? `${resultado.acidoMalico}g` : "—"}</span>
               </div>
+              {citrico.msg && (
+                <div className="flex justify-between">
+                  <span>MSG</span>
+                  <span>{resultado?.msg ? `${resultado.msg}g` : "—"}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Água</span>
                 <span>{resultado ? `${resultado.agua}g` : "—"}</span>
               </div>
             </div>
 
-            <button className="text-xs text-black/50 underline mt-4">
-              Confira outros cítricos
-            </button>
           </div>
         </main>
 
@@ -311,6 +322,7 @@ export default function App() {
           if (label === "Bases & Xaropes") setView("bases");
           if (label === "Super Juice Calculator") setView("calculator");
           if (label === "Sobre o app") setView("sobre");
+          if (label === "Favoritos") setView("favoritos");
         }}
       />
     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Heart } from "lucide-react";
+import { isFavorite, toggleFavorite } from "./favorites";
 
 const COCKTAILS_API_URL = "https://x8ki-letl-twmt.n7.xano.io/api:ePYR7DTm/cocktails";
 
@@ -7,6 +8,7 @@ export default function CocktailDetail({ cocktailId, onBack }) {
   const [cocktail, setCocktail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [favorito, setFavorito] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -25,6 +27,15 @@ export default function CocktailDetail({ cocktailId, onBack }) {
       });
   }, [cocktailId]);
 
+  useEffect(() => {
+    setFavorito(isFavorite(cocktailId));
+  }, [cocktailId]);
+
+  const handleToggleFavorite = () => {
+    toggleFavorite(cocktailId);
+    setFavorito((prev) => !prev);
+  };
+
   return (
     <div
       className="min-h-screen bg-black text-white flex justify-center"
@@ -37,8 +48,13 @@ export default function CocktailDetail({ cocktailId, onBack }) {
             <ArrowLeft size={22} strokeWidth={1.5} />
           </button>
           <img src="/assets/chefedebar-logo.png" alt="chefedebar" className="h-7" />
-          <button aria-label="Favoritar" className="text-white">
-            <Heart size={20} strokeWidth={1.5} />
+          <button aria-label="Favoritar" onClick={handleToggleFavorite} className="text-white">
+            <Heart
+              size={20}
+              strokeWidth={1.5}
+              className={favorito ? "text-red-500" : "text-white"}
+              fill={favorito ? "currentColor" : "none"}
+            />
           </button>
         </header>
 

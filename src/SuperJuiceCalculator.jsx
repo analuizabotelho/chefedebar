@@ -2,10 +2,13 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import BottomNav from "./BottomNav";
 
+const AGUA_MULTIPLICADOR = 16.66; // água = peso das cascas × 16.66, igual em todos os cítricos
+
 const CITRICOS = [
-  { nome: "Limão Siciliano", emoji: "🍋", acidoCitrico: "6.4%", acidoMalico: "0.1%", agua: "88%" },
-  { nome: "Limão Taiti", emoji: "🍋‍🟩", acidoCitrico: "5.0%", acidoMalico: "0.1%", agua: "90%" },
-  { nome: "Laranja", emoji: "🍊", acidoCitrico: "1.0%", acidoMalico: "0.2%", agua: "86%" },
+  { nome: "Limão Siciliano", emoji: "🍋", acidoCitrico: 1.0, acidoMalico: 0 },
+  { nome: "Limão Taiti", emoji: "🍋‍🟩", acidoCitrico: 0.6667, acidoMalico: 0.333 },
+  { nome: "Laranja", emoji: "🍊", acidoCitrico: 0.90, acidoMalico: 0.11 },
+  { nome: "Toranja", emoji: "🍈", acidoCitrico: 0.80, acidoMalico: 0.20, msg: 0.0333 },
 ];
 
 function CitricoCalcCard({ citrico }) {
@@ -18,13 +21,11 @@ function CitricoCalcCard({ citrico }) {
       setResultado(null);
       return;
     }
-    const ac = parseFloat(citrico.acidoCitrico) / 100;
-    const am = parseFloat(citrico.acidoMalico) / 100;
-    const ag = parseFloat(citrico.agua) / 100;
     setResultado({
-      acidoCitrico: (peso * ac).toFixed(1),
-      acidoMalico: (peso * am).toFixed(1),
-      agua: (peso * ag).toFixed(1),
+      acidoCitrico: (peso * citrico.acidoCitrico).toFixed(1),
+      acidoMalico: (peso * citrico.acidoMalico).toFixed(1),
+      msg: citrico.msg ? (peso * citrico.msg).toFixed(1) : null,
+      agua: (peso * AGUA_MULTIPLICADOR).toFixed(0),
     });
   }
 
@@ -62,6 +63,12 @@ function CitricoCalcCard({ citrico }) {
           <span>Ácido Málico</span>
           <span>{resultado ? `${resultado.acidoMalico}g` : "—"}</span>
         </div>
+        {citrico.msg && (
+          <div className="flex justify-between">
+            <span>MSG</span>
+            <span>{resultado ? `${resultado.msg}g` : "—"}</span>
+          </div>
+        )}
         <div className="flex justify-between">
           <span>Água</span>
           <span>{resultado ? `${resultado.agua}g` : "—"}</span>
