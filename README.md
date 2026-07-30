@@ -36,4 +36,4 @@ O banco foi estruturado no Xano com tabelas normalizadas para bebidas, xaropes e
 
 ## 📌 Status
 
-Em desenvolvimento — próximas etapas incluem as telas de Bases & Xaropes, História & Contexto e Favoritos.
+Em desenvolvimento.
